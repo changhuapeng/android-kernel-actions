@@ -26,6 +26,8 @@ arch="$1"
 compiler="$2"
 defconfig="$3"
 image="$4"
+dtb="$5"
+dtbo="$6"
 repo_name="${GITHUB_REPOSITORY/*\/}"
 zipper_path="${ZIPPER_PATH:-zipper}"
 kernel_path="${KERNEL_PATH:-.}"
@@ -287,6 +289,38 @@ msg "Packaging the kernel..."
 zip_filename="${name}-${date}.zip"
 if [[ -e "$workdir"/"$zipper_path" ]]; then
     cp out/arch/"$arch"/boot/"$image" "$workdir"/"$zipper_path"/"$image"
+
+    if $dtb; then
+        if ! cp out/arch/"$arch"/boot/dtb "$workdir"/"$zipper_path"/dtb &>/dev/null; then
+	    find out/arch/"$arch"/boot -type f -name '*.dtb' -exec cp {} "$workdir"/"$zipper_path"/dtb \;
+        fi
+
+        if [[ ! -f "$workdir"/"$zipper_path"/dtb ]]; then
+            err "dtb image not found"
+            exit 1
+        fi
+    fi
+
+    if $dtbo; then
+        if ! cp out/arch/"$arch"/boot/dtbo.img "$workdir"/"$zipper_path"/dtbo.img &>/dev/null; then
+            find out/arch/"$arch"/boot -type f -name '*.dtbo' -exec cp {} /tmp/tmp.dtbo \;
+        fi
+        if [[ -f /tmp/tmp.dtbo ]]; then
+            echo "Packing dtbo file into image"
+            url="https://android.googlesource.com/platform/system/libufdt/+/refs/tags/android-13.0.0_r15/utils/src/mkdtboimg.py"
+            if ! wget --no-check-certificate "$url" -O "$workdir"/scripts/ &>/dev/null; then
+                err "Failed downloading mkdtboimg.py script"
+                exit 1
+            fi
+            python "$workdir"/scripts/mkdtboimg.py create "$workdir"/"$zipper_path"/dtbo.img --page_size=4096 /tmp/tmp.dtbo
+        fi
+
+        if [[ ! -f "$workdir"/"$zipper_path"/dtbo.img ]]; then
+            err "dtbo image not found"
+            exit 1
+        fi
+    fi
+
     cd "$workdir"/"$zipper_path" || exit 127
     rm -rf .git
     zip -r9 "$zip_filename" . -x .gitignore README.md || exit 127
@@ -295,6 +329,36 @@ if [[ -e "$workdir"/"$zipper_path" ]]; then
     exit 0
 else
     msg "No zip template provided, releasing the kernel image instead"
-    set_output outfile out/arch/"$arch"/boot/"$image"
+    set_output image out/arch/"$arch"/boot/"$image"
+
+    if $dtb; then
+        if [[ -f out/arch/"$arch"/boot/dtb ]]; then
+            set_output dtb out/arch/"$arch"/boot/dtb
+        else
+            find out/arch/"$arch"/boot -type f -name '*.dtb' -exec cp {} /tmp/dtb \;
+            if [[ -f /tmp/dtb ]]; then
+                set_output dtb /tmp/dtb
+            fi
+        fi
+    fi
+
+    if $dtbo; then
+        if [[ -f out/arch/"$arch"/boot/dtbo.img ]]; then
+            set_output dtbo out/arch/"$arch"/boot/dtbo.img
+        else
+            find out/arch/"$arch"/boot -type f -name '*.dtbo' -exec cp {} /tmp/tmp.dtbo \;
+            if [[ -f /tmp/tmp.dtbo ]]; then
+                echo "Packing dtbo file into image"
+                url="https://android.googlesource.com/platform/system/libufdt/+/refs/tags/android-13.0.0_r15/utils/src/mkdtboimg.py"
+                if ! wget --no-check-certificate "$url" -O "$workdir"/scripts/ &>/dev/null; then
+                    err "Failed downloading mkdtboimg.py script"
+                    exit 1
+                fi
+                python "$workdir"/scripts/mkdtboimg.py create /tmp/dtbo.img --page_size=4096 /tmp/tmp.dtbo
+                set_output dtbo /tmp/dtbo.img
+            fi
+        fi
+    fi
+
     exit 0
 fi

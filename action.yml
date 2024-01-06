@@ -17,9 +17,21 @@ inputs:
   image:
     description: Kernel image name
     required: true
+  dtb:
+    description: dtb image support
+    required: true
+  dtbo:
+    description: dtbo image support
+    required: true
 outputs:
   outfile:
     description: Zip file generated from build
+  image:
+    description: Kernel image generated from build
+  dtb:
+    description: dtb image generated from build
+  dtbo:
+    description: dtbo image generated from build
 runs:
   using: docker
   image: Dockerfile
@@ -28,3 +40,5 @@ runs:
     - ${{ inputs.compiler }}
     - ${{ inputs.defconfig }}
     - ${{ inputs.image }}
+    - ${{ inputs.dtb }}
+    - ${{ inputs.dtbo }}

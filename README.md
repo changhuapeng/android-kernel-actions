@@ -14,6 +14,8 @@ Builds Android kernel from the kernel repository.
 | `compiler` | Specify which toochain to use |
 | `defconfig` | Specify what defconfig command used to generate `.config` file |
 | `image` | Specify what is the final build file, usually it's `Image.gz-dtb` or `Image-dtb` |
+| `dtb` | Specify if dtb image is required or not, `true` or `false` |
+| `dtbo` | Specify if dtbo image is required or not, `true` or `false` |
 
 ### Environment Variables
 
@@ -29,12 +31,15 @@ Builds Android kernel from the kernel repository.
 | Output | Description |
 | --- | --- |
 | `elapsed_time` | Time elapsed from building the kernel in seconds, excluding zipping and downloading toolchains |
-| `outfile` | Path to the final build file |
+| `outfile` | Path to the final build flashable zip file |
+| `image` | Path to the build kernel image |
+| `dtb` | Path to the build dtb image |
+| `dtbo` | Path to the build dtbo image |
 | `hash` | Kernel commit hash |
 
 ## AnyKernel3
 
-Put the AnyKernel3 template to `zipper`. Providing AnyKernel3 template is optional, the `outfile` output varies based on this. If AnyKernel3 template is provided, this Action will create a flashable zip file based on the AnyKernel3 template and the `outfile` output will be the path to the zipfile. if not the `outfile` will be the path to the kernel image. See the [examples](#example-usage).
+Put the AnyKernel3 template to `zipper`. Providing AnyKernel3 template is optional, the `outfile` output varies based on this. If AnyKernel3 template is provided, this Action will create a flashable zip file based on the AnyKernel3 template and the `outfile` output will be the path to the zipfile. if not `image`, `dtb`, `dtbo` will be the path to the kernel, dtb, dtbo images, respectively. See the [examples](#example-usage).
 
 ## Getting the build
 

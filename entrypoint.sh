@@ -35,9 +35,10 @@ python_version="${PYTHON_VERSION:-3}"
 msg "Updating container..."
 apt update && apt upgrade -y
 msg "Installing essential packages..."
-apt install -y --no-install-recommends git make bc bison openssl \
-    curl zip kmod cpio flex libelf-dev libssl-dev libtfm-dev wget \
-    device-tree-compiler ca-certificates python3 python2 xz-utils
+apt install -y --no-install-recommends bc bison build-essential \
+    cpio ca-certificates curl device-tree-compiler flex git \
+    gnupg kmod libelf-dev libssl-dev libtfm-dev libxml2-utils \
+    python2 python3 wget
 ln -sf "/usr/bin/python${python_version}" /usr/bin/python
 set_output hash "$(cd "$kernel_path" && git rev-parse HEAD || exit 127)"
 msg "Installing toolchain..."
@@ -270,6 +271,9 @@ if ! make O=out $arch_opts $make_opts $host_make_opts "$defconfig"; then
     err "Failed generating .config, make sure it is actually available in arch/${arch}/configs/ and is a valid defconfig file"
     exit 2
 fi
+echo "Packages installed:"
+apt list --installed
+
 msg "Begin building kernel..."
 
 make O=out $arch_opts $make_opts $host_make_opts -j"$(nproc --all)" prepare

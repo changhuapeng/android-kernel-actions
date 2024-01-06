@@ -74,13 +74,13 @@ if [[ $arch = "arm64" ]]; then
 
         if $binutils; then
             additional_packages="binutils binutils-aarch64-linux-gnu binutils-arm-linux-gnueabi"
-            make_opts="CC=clang"
+            make_opts="CC=clang DTC_EXT=dtc"
             host_make_opts="HOSTCC=clang HOSTCXX=clang++"
         else
             # Most android kernels still need binutils as the assembler, but it will
             # not be used when the Makefile is patched to make use of LLVM_IAS option
             additional_packages="binutils-aarch64-linux-gnu binutils-arm-linux-gnueabi"
-            make_opts="CC=clang LD=ld.lld NM=llvm-nm AR=llvm-ar STRIP=llvm-strip OBJCOPY=llvm-objcopy"
+            make_opts="CC=clang DTC_EXT=dtc LD=ld.lld NM=llvm-nm AR=llvm-ar STRIP=llvm-strip OBJCOPY=llvm-objcopy"
             make_opts+=" OBJDUMP=llvm-objdump READELF=llvm-readelf LLVM_IAS=1"
             host_make_opts="HOSTCC=clang HOSTCXX=clang++ HOSTLD=ld.lld HOSTAR=llvm-ar"
         fi
@@ -117,10 +117,10 @@ if [[ $arch = "arm64" ]]; then
         fi
 
         if $binutils; then
-            make_opts="CC=clang"
+            make_opts="CC=clang DTC_EXT=dtc"
             host_make_opts="HOSTCC=clang HOSTCXX=clang++"
         else
-            make_opts="CC=clang LD=ld.lld NM=llvm-nm AR=llvm-ar STRIP=llvm-strip OBJCOPY=llvm-objcopy"
+            make_opts="CC=clang DTC_EXT=dtc LD=ld.lld NM=llvm-nm AR=llvm-ar STRIP=llvm-strip OBJCOPY=llvm-objcopy"
             make_opts+=" OBJDUMP=llvm-objdump READELF=llvm-readelf LLVM_IAS=1"
             host_make_opts="HOSTCC=clang HOSTCXX=clang++ HOSTLD=ld.lld HOSTAR=llvm-ar"
         fi
@@ -176,10 +176,10 @@ if [[ $arch = "arm64" ]]; then
         done
 
         if $binutils; then
-            make_opts="CC=clang"
+            make_opts="CC=clang DTC_EXT=dtc"
             host_make_opts="HOSTCC=clang HOSTCXX=clang++"
         else
-            make_opts="CC=clang LD=ld.lld NM=llvm-nm STRIP=llvm-strip OBJCOPY=llvm-objcopy"
+            make_opts="CC=clang DTC_EXT=dtc LD=ld.lld NM=llvm-nm STRIP=llvm-strip OBJCOPY=llvm-objcopy"
             make_opts+=" OBJDUMP=llvm-objdump READELF=llvm-readelf LLVM_IAS=1"
             host_make_opts="HOSTCC=clang HOSTCXX=clang++ HOSTLD=ld.lld HOSTAR=llvm-ar"
         fi
@@ -196,10 +196,10 @@ if [[ $arch = "arm64" ]]; then
         binutils="$([[ $ver = */binutils ]] && echo true || echo false)"
 
         if $binutils; then
-            make_opts="CC=clang"
+            make_opts="CC=clang DTC_EXT=dtc"
             host_make_opts="HOSTCC=clang HOSTCXX=clang++"
         else
-            make_opts="CC=clang LD=ld.lld NM=llvm-nm AR=llvm-ar STRIP=llvm-strip OBJCOPY=llvm-objcopy"
+            make_opts="CC=clang DTC_EXT=dtc LD=ld.lld NM=llvm-nm AR=llvm-ar STRIP=llvm-strip OBJCOPY=llvm-objcopy"
             make_opts+=" OBJDUMP=llvm-objdump READELF=llvm-readelf LLVM_IAS=1"
             host_make_opts="HOSTCC=clang HOSTCXX=clang++ HOSTLD=ld.lld HOSTAR=llvm-ar"
         fi
@@ -233,10 +233,10 @@ if [[ $arch = "arm64" ]]; then
         fi
 
         if $binutils; then
-            make_opts="CC=clang"
+            make_opts="CC=clang DTC_EXT=dtc"
             host_make_opts="HOSTCC=clang HOSTCXX=clang++"
         else
-            make_opts="CC=clang LD=ld.lld NM=llvm-nm AR=llvm-ar STRIP=llvm-strip OBJCOPY=llvm-objcopy"
+            make_opts="CC=clang DTC_EXT=dtc LD=ld.lld NM=llvm-nm AR=llvm-ar STRIP=llvm-strip OBJCOPY=llvm-objcopy"
             make_opts+=" OBJDUMP=llvm-objdump READELF=llvm-readelf LLVM_IAS=1"
             host_make_opts="HOSTCC=clang HOSTCXX=clang++ HOSTLD=ld.lld HOSTAR=llvm-ar"
         fi

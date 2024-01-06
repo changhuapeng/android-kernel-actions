@@ -40,7 +40,7 @@ msg "Installing essential packages..."
 apt install -y --no-install-recommends bc bison build-essential \
     cpio ca-certificates curl device-tree-compiler flex git \
     gnupg kmod libelf-dev libssl-dev libtfm-dev libxml2-utils \
-    python2 python3 wget
+    python2 python3 wget zip
 ln -sf "/usr/bin/python${python_version}" /usr/bin/python
 set_output hash "$(cd "$kernel_path" && git rev-parse HEAD || exit 127)"
 msg "Installing toolchain..."

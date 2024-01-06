@@ -95,6 +95,16 @@ For older Clang use v0.4.0 action version
 - `aosp-clang/<branch>/<clang version>`, `aosp-clang/<branch>/<clang version>/binutils`
 > Example : `aosp-clang/master/clang-r416183b`, `aosp-clang/android11-release/clang-r365631c/binutils`
 
+#### [Neutron Clang](https://github.com/Neutron-Toolchains/clang-build-catalogue)
+
+- `neutron-clang/<latest or tag>`, `neutron-clang/<latest or tag>/binutils`
+> Example : `neutron-clang/latest`, `neutron-clang/42069420/binutils`
+
+#### [Greenforce Clang](https://github.com/greenforce-project/greenforce_clang)
+
+- `greenforce-clang/<version-builddate>`, `greenforce-clang/<version-builddate>/binutils`
+> Example : `greenforce-clang/18.0.0git-31122023-0135`, `greenforce-clang/17.0.6-22122023-1252/binutils`
+
 ## Example usage
 
 ### With [`ncipollo/release-action`](https://github.com/ncipollo/release-action)

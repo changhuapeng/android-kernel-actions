@@ -307,12 +307,15 @@ if [[ -e "$workdir"/"$zipper_path" ]]; then
         fi
         if [[ -f /tmp/tmp.dtbo ]]; then
             echo "Packing dtbo file into image"
-            url="https://android.googlesource.com/platform/system/libufdt/+/refs/tags/android-13.0.0_r15/utils/src/mkdtboimg.py"
-            if ! wget --no-check-certificate "$url" -O "$workdir"/scripts/mkdtboimg.py &>/dev/null; then
+            url="https://android.googlesource.com/platform/system/libufdt/+archive/android-platform-13.0.0_r15/utils.tar.gz"
+            if ! wget --no-check-certificate "$url" -O /tmp/libufdt-utils.tar.gz &>/dev/null; then
                 err "Failed downloading mkdtboimg.py script"
                 exit 1
             fi
-            python "$workdir"/scripts/mkdtboimg.py create "$workdir"/"$zipper_path"/dtbo.img --page_size=4096 /tmp/tmp.dtbo
+            mkdir -p libufdt-utils
+            extract_tarball /tmp/libufdt-utils.tar.gz libufdt-utils
+            cd libufdt-utils/src || exit 127
+            python mkdtboimg.py create "$workdir"/"$zipper_path"/dtbo.img --page_size=4096 /tmp/tmp.dtbo
         fi
 
         if [[ ! -f "$workdir"/"$zipper_path"/dtbo.img ]]; then
@@ -349,12 +352,15 @@ else
             find out/arch/"$arch"/boot -type f -name '*.dtbo' -exec cp {} /tmp/tmp.dtbo \;
             if [[ -f /tmp/tmp.dtbo ]]; then
                 echo "Packing dtbo file into image"
-                url="https://android.googlesource.com/platform/system/libufdt/+/refs/tags/android-13.0.0_r15/utils/src/mkdtboimg.py"
-                if ! wget --no-check-certificate "$url" -O "$workdir"/scripts/mkdtboimg.py &>/dev/null; then
+                url="https://android.googlesource.com/platform/system/libufdt/+archive/android-platform-13.0.0_r15/utils.tar.gz"
+                if ! wget --no-check-certificate "$url" -O /tmp/libufdt-utils.tar.gz &>/dev/null; then
                     err "Failed downloading mkdtboimg.py script"
                     exit 1
                 fi
-                python "$workdir"/scripts/mkdtboimg.py create /tmp/dtbo.img --page_size=4096 /tmp/tmp.dtbo
+                mkdir -p libufdt-utils
+                extract_tarball /tmp/libufdt-utils.tar.gz libufdt-utils
+                cd libufdt-utils/src || exit 127
+                python mkdtboimg.py create /tmp/dtbo.img --page_size=4096 /tmp/tmp.dtbo
                 set_output dtbo /tmp/dtbo.img
             fi
         fi

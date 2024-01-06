@@ -142,7 +142,9 @@ jobs:
         arch: arm64
         compiler: gcc/10
         defconfig: vince_defconfig
-        image: Image.gz-dtb
+        image: Image.gz
+        dtb: false
+        dtbo: true
 
     - name: Release build
       uses: ncipollo/release-action@v1
@@ -181,7 +183,9 @@ jobs:
         arch: arm64
         compiler: gcc/10
         defconfig: vince_defconfig
-        image: Image.gz-dtb
+        image: Image.gz
+        dtb: false
+        dtbo: true
 
     - name: Release build
       uses: appleboy/telegram-action@master

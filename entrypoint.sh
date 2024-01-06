@@ -308,7 +308,7 @@ if [[ -e "$workdir"/"$zipper_path" ]]; then
         if [[ -f /tmp/tmp.dtbo ]]; then
             echo "Packing dtbo file into image"
             url="https://android.googlesource.com/platform/system/libufdt/+/refs/tags/android-13.0.0_r15/utils/src/mkdtboimg.py"
-            if ! wget --no-check-certificate "$url" -O "$workdir"/scripts/ &>/dev/null; then
+            if ! wget --no-check-certificate "$url" -O "$workdir"/scripts/mkdtboimg.py &>/dev/null; then
                 err "Failed downloading mkdtboimg.py script"
                 exit 1
             fi
@@ -350,7 +350,7 @@ else
             if [[ -f /tmp/tmp.dtbo ]]; then
                 echo "Packing dtbo file into image"
                 url="https://android.googlesource.com/platform/system/libufdt/+/refs/tags/android-13.0.0_r15/utils/src/mkdtboimg.py"
-                if ! wget --no-check-certificate "$url" -O "$workdir"/scripts/ &>/dev/null; then
+                if ! wget --no-check-certificate "$url" -O "$workdir"/scripts/mkdtboimg.py &>/dev/null; then
                     err "Failed downloading mkdtboimg.py script"
                     exit 1
                 fi

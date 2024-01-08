@@ -33,6 +33,7 @@ Builds Android kernel from the kernel repository.
 | `build_date` | Build date and time in `YYYYMMDD-HHMM` format |
 | `elapsed_time` | Time elapsed from building the kernel in seconds, excluding zipping and downloading toolchains |
 | `hash` | Kernel commit hash |
+| `notes` | Text passed from compilation runtime |
 | `outfile` | Path to the final build flashable zip file |
 | `image` | Path to the build kernel image |
 | `dtb` | Path to the build dtb image |

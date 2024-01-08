@@ -292,7 +292,7 @@ if [[ -e "$workdir"/"$zipper_path" ]]; then
 
     if $dtb; then
         if ! cp out/arch/"$arch"/boot/dtb "$workdir"/"$zipper_path"/dtb &>/dev/null; then
-	    find out/arch/"$arch"/boot -type f -name '*.dtb' -exec cp {} "$workdir"/"$zipper_path"/dtb \;
+	    find out/arch/"$arch"/boot -type f -name "*.dtb" -exec cp {} "$workdir"/"$zipper_path"/dtb \;
         fi
 
         if [[ ! -f "$workdir"/"$zipper_path"/dtb ]]; then
@@ -303,7 +303,7 @@ if [[ -e "$workdir"/"$zipper_path" ]]; then
 
     if $dtbo; then
         if ! cp out/arch/"$arch"/boot/dtbo.img "$workdir"/"$zipper_path"/dtbo.img &>/dev/null; then
-            find out/arch/"$arch"/boot -type f -name '*.dtbo' -exec cp {} /tmp/tmp.dtbo \;
+            find out/arch/"$arch"/boot -type f -name "*.dtbo" -exec cp {} /tmp/tmp.dtbo \;
         fi
         if [[ -f /tmp/tmp.dtbo ]]; then
             echo "Packing dtbo file into image"
@@ -338,7 +338,7 @@ else
         if [[ -f out/arch/"$arch"/boot/dtb ]]; then
             set_output dtb out/arch/"$arch"/boot/dtb
         else
-            find out/arch/"$arch"/boot -type f -name '*.dtb' -exec cp {} /tmp/dtb \;
+            find out/arch/"$arch"/boot -type f -name "*.dtb" -exec cp {} /tmp/dtb \;
             if [[ -f /tmp/dtb ]]; then
                 set_output dtb /tmp/dtb
             fi
@@ -349,7 +349,7 @@ else
         if [[ -f out/arch/"$arch"/boot/dtbo.img ]]; then
             set_output dtbo out/arch/"$arch"/boot/dtbo.img
         else
-            find out/arch/"$arch"/boot -type f -name '*.dtbo' -exec cp {} /tmp/tmp.dtbo \;
+            find out/arch/"$arch"/boot -type f -name "*.dtbo" -exec cp {} /tmp/tmp.dtbo \;
             if [[ -f /tmp/tmp.dtbo ]]; then
                 echo "Packing dtbo file into image"
                 url="https://android.googlesource.com/platform/system/libufdt/+archive/android-platform-13.0.0_r15/utils.tar.gz"

@@ -33,6 +33,9 @@ outputs:
   hash:
     description: Kernel commit hash
     value: ${{ steps.run-action.outputs.hash }}
+  notes:
+    description: Text passed from compilation runtime
+    value: ${{ steps.run-action.outputs.notes }}
   outfile:
     description: Zip file generated from build
     value: ${{ steps.run-action.outputs.outfile }}

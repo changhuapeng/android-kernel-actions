@@ -1,6 +1,6 @@
 name: Android Kernel Action
 description: Build android kernel with GitHub Action
-author: Syahrial Agni Prasetya <lemniskett@protonmail.com>
+author: changhuapeng <changhuapeng@users.noreply.github.com>
 branding:
   icon: box
   color: green
@@ -24,21 +24,38 @@ inputs:
     description: dtbo image support
     required: true
 outputs:
+  build_date:
+    description: Build date and time
+    value: ${{ steps.run-action.outputs.build_date }}
+  elapsed_time:
+    description: Time elapsed from building the kernel in seconds
+    value: ${{ steps.run-action.outputs.elapsed_time }}
+  hash:
+    description: Kernel commit hash
+    value: ${{ steps.run-action.outputs.hash }}
   outfile:
     description: Zip file generated from build
+    value: ${{ steps.run-action.outputs.outfile }}
   image:
     description: Kernel image generated from build
+    value: ${{ steps.run-action.outputs.image }}
   dtb:
     description: dtb image generated from build
+    value: ${{ steps.run-action.outputs.dtb }}
   dtbo:
     description: dtbo image generated from build
+    value: ${{ steps.run-action.outputs.dtbo }}
 runs:
-  using: docker
-  image: Dockerfile
-  args:
-    - ${{ inputs.arch }}
-    - ${{ inputs.compiler }}
-    - ${{ inputs.defconfig }}
-    - ${{ inputs.image }}
-    - ${{ inputs.dtb }}
-    - ${{ inputs.dtbo }}
+  using: composite
+  steps:
+    - name: Run action
+      id: run-action
+      env:
+        ARCH: ${{ inputs.arch }}
+        COMPILER: ${{ inputs.compiler }}
+        DEFCONFIG: ${{ inputs.defconfig }}
+        IMAGE: ${{ inputs.image }}
+        DTB: ${{ inputs.dtb }}
+        DTBO: ${{ inputs.dtbo }}
+      shell: bash
+      run: ${{ github.action_path }}/entrypoint.sh

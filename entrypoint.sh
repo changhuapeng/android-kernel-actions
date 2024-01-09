@@ -391,6 +391,7 @@ if [[ -e "$workdir"/"$zipper_path" ]]; then
     fi
 
     cd "$workdir"/"$zipper_path" || exit 127
+    sed -i -E "s/(kernel.string=).*/\1${name} Kernel by $GITHUB_REPOSITORY_OWNER/i" "$workdir"/"$zipper_path"/anykernel.sh
     rm -rf .git
     zip -r9 "$zip_filename" . -x .gitignore README.md || exit 127
     set_output outfile "$workdir"/"$zipper_path"/"$zip_filename"

@@ -37,9 +37,9 @@ name="${NAME:-$repo_name}"
 python_version="${PYTHON_VERSION:-3}"
 
 msg "Updating container..."
-sudo apt update && sudo apt upgrade -y
+sudo apt-get update -y -q && sudo apt-get upgrade -y -q
 msg "Installing essential packages..."
-sudo apt install -y --no-install-recommends bc bison build-essential \
+sudo apt-get install -y -q --no-install-recommends bc bison build-essential \
     cpio ca-certificates curl device-tree-compiler flex git \
     gnupg kmod libelf-dev libssl-dev libtfm-dev libxml2-utils \
     python2 python3 wget zip
@@ -56,7 +56,7 @@ if [[ $arch = "arm64" ]]; then
         make_opts=""
         host_make_opts=""
 
-        if ! sudo apt install -y --no-install-recommends gcc-"$ver_number" g++-"$ver_number" \
+        if ! sudo apt-get install -y -q --no-install-recommends gcc-"$ver_number" g++-"$ver_number" \
             gcc-"$ver_number"-aarch64-linux-gnu gcc-"$ver_number"-arm-linux-gnueabi; then
             err "Compiler package not found, refer to the README for details"
             exit 1
@@ -87,7 +87,7 @@ if [[ $arch = "arm64" ]]; then
             host_make_opts="HOSTCC=clang HOSTCXX=clang++ HOSTLD=ld.lld HOSTAR=llvm-ar"
         fi
 
-        if ! sudo apt install -y --no-install-recommends clang-"$ver_number" \
+        if ! sudo apt-get install -y -q --no-install-recommends clang-"$ver_number" \
             lld-"$ver_number" llvm-"$ver_number" $additional_packages; then
             err "Compiler package not found, refer to the README for details"
             exit 1
@@ -127,7 +127,7 @@ if [[ $arch = "arm64" ]]; then
             host_make_opts="HOSTCC=clang HOSTCXX=clang++ HOSTLD=ld.lld HOSTAR=llvm-ar"
         fi
 
-        sudo apt install -y --no-install-recommends libgcc-10-dev || exit 127
+        sudo apt-get install -y -q --no-install-recommends libgcc-10-dev || exit 127
         extract_tarball /tmp/proton-clang-"${ver_number}".tar.gz /
         cd /proton-clang-"${ver_number}"* || exit 127
         proton_path="$(pwd)"
@@ -186,7 +186,7 @@ if [[ $arch = "arm64" ]]; then
             host_make_opts="HOSTCC=clang HOSTCXX=clang++ HOSTLD=ld.lld HOSTAR=llvm-ar"
         fi
 
-        sudo apt install -y --no-install-recommends libgcc-10-dev || exit 127
+        sudo apt-get install -y -q --no-install-recommends libgcc-10-dev || exit 127
 
         export PATH="/aosp-clang/bin:/aosp-gcc-arm64/bin:/aosp-gcc-arm/bin:/aosp-gcc-host/bin:$PATH"
         export CLANG_TRIPLE="aarch64-linux-gnu-"
@@ -206,7 +206,7 @@ if [[ $arch = "arm64" ]]; then
             host_make_opts="HOSTCC=clang HOSTCXX=clang++ HOSTLD=ld.lld HOSTAR=llvm-ar"
         fi
 
-        sudo apt install -y --no-install-recommends libgcc-10-dev zstd libxml2 libarchive-tools || exit 127
+        sudo apt-get install -y -q --no-install-recommends libgcc-10-dev zstd libxml2 libarchive-tools || exit 127
         mkdir neutron-clang
         cd neutron-clang || exit 127
         curl -LO "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman"
@@ -243,7 +243,7 @@ if [[ $arch = "arm64" ]]; then
             host_make_opts="HOSTCC=clang HOSTCXX=clang++ HOSTLD=ld.lld HOSTAR=llvm-ar"
         fi
 
-        sudo apt install -y --no-install-recommends libgcc-10-dev zstd || exit 127
+        sudo apt-get install -y -q --no-install-recommends libgcc-10-dev zstd || exit 127
 
         mkdir -p greenforce-clang
         cd greenforce-clang || exit 127
@@ -327,7 +327,7 @@ if $kernelsu; then
     set_output notes "Integrated with KernelSU [$ksu_tag](https://github.com/tiann/KernelSU/releases/tag/$ksu_tag)"
 fi
 echo "Packages installed:"
-sudo apt list --installed
+sudo apt list -q --installed
 
 cd "$workdir"/"$kernel_path" || exit 127
 start_time="$(date +%s)"

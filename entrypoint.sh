@@ -322,6 +322,7 @@ if $kernelsu; then
             exit 3
         fi
     fi
+    cd "$workdir"/KernelSU || exit 127
     ksu_tag="$(git describe --abbrev=0 --tags)"
     set_output notes "Integrated with KernelSU [$ksu_tag](https://github.com/tiann/KernelSU/releases/tag/$ksu_tag)"
 fi

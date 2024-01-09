@@ -293,7 +293,7 @@ if [[ -e "$workdir"/"$zipper_path" ]]; then
 
     if $dtb; then
         if ! cp out/arch/"$arch"/boot/dtb "$workdir"/"$zipper_path"/dtb &>/dev/null; then
-	    find out/arch/"$arch"/boot -type f -name "*.dtb" -exec cp {} "$workdir"/"$zipper_path"/dtb \;
+            find out/arch/"$arch"/boot -type f -name "*.dtb" -exec cp {} "$workdir"/"$zipper_path"/dtb \;
         fi
 
         if [[ ! -f "$workdir"/"$zipper_path"/dtb ]]; then

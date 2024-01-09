@@ -372,7 +372,7 @@ if [[ -e "$workdir"/"$zipper_path" ]]; then
         fi
         if [[ -f /tmp/tmp.dtbo ]]; then
             echo "Packing dtbo file into image"
-            url="https://android.googlesource.com/platform/system/libufdt/+archive/android-platform-13.0.0_r15/utils.tar.gz"
+            url="https://android.googlesource.com/platform/system/libufdt/+archive/refs/tags/android-platform-14.0.0_r1/utils.tar.gz"
             if ! wget --no-check-certificate "$url" -O /tmp/libufdt-utils.tar.gz &>/dev/null; then
                 err "Failed downloading mkdtboimg.py script"
                 exit 1
@@ -417,7 +417,7 @@ else
             find out/arch/"$arch"/boot -type f -name "*.dtbo" -exec cp {} /tmp/tmp.dtbo \;
             if [[ -f /tmp/tmp.dtbo ]]; then
                 echo "Packing dtbo file into image"
-                url="https://android.googlesource.com/platform/system/libufdt/+archive/android-platform-13.0.0_r15/utils.tar.gz"
+                url="https://android.googlesource.com/platform/system/libufdt/+archive/refs/tags/android-platform-14.0.0_r1/utils.tar.gz"
                 if ! wget --no-check-certificate "$url" -O /tmp/libufdt-utils.tar.gz &>/dev/null; then
                     err "Failed downloading mkdtboimg.py script"
                     exit 1

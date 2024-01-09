@@ -16,6 +16,8 @@ Builds Android kernel from the kernel repository.
 | `image` | Specify what is the final build file, usually it's `Image.gz-dtb` or `Image-dtb` |
 | `dtb` | Specify if dtb image is required or not, `true` or `false` |
 | `dtbo` | Specify if dtbo image is required or not, `true` or `false` |
+| `kernelsu` | Specify if KernelSU integration is required, `true` or `false` |
+| `kprobes` | Specify if KernelSU should be integrated with Kprobes, `true` or `false` |
 
 ### Environment Variables
 
@@ -147,6 +149,8 @@ jobs:
         image: Image.gz
         dtb: false
         dtbo: true
+        kernelsu: false
+        kprobes: false
 
     - name: Release build
       uses: ncipollo/release-action@v1
@@ -188,6 +192,8 @@ jobs:
         image: Image.gz
         dtb: false
         dtbo: true
+        kernelsu: false
+        kprobes: false
 
     - name: Release build
       uses: appleboy/telegram-action@master

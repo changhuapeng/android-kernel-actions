@@ -28,6 +28,8 @@ defconfig="${DEFCONFIG:?'was not set'}"
 image="${IMAGE:?'was not set'}"
 dtb="${DTB:?'was not set'}"
 dtbo="${DTBO:?'was not set'}"
+kernelsu="${KERNELSU:?'was not set'}"
+kprobes="${KPROBES:?'was not set'}"
 repo_name="${GITHUB_REPOSITORY/*\/}"
 zipper_path="${ZIPPER_PATH:-zipper}"
 kernel_path="${KERNEL_PATH:-.}"
@@ -260,6 +262,68 @@ if [[ $arch = "arm64" ]]; then
 else
     err "Currently this action only supports arm64, refer to the README for more detail"
     exit 100
+fi
+
+cd "$workdir"/"$kernel_path" || exit 127
+if $kernelsu; then
+    msg "Integrating KernelSU for non GKI kernel..."
+    if ! curl -LSs "https://raw.githubusercontent.com/changhuapeng/KernelSU/main/kernel/setup.sh" | bash -; then
+        err "Failed downloading KernelSU"
+        exit 1
+    fi
+
+    if $kprobes; then
+        if ! grep -q "CONFIG_KPROBES=y" arch/"$arch"/configs/"$defconfig"; then
+            if grep -q "# CONFIG_KPROBES is not set" arch/"$arch"/configs/"$defconfig"; then
+                sed -i "s/# CONFIG_KPROBES is not set/CONFIG_KPROBES=y/i" arch/"$arch"/configs/"$defconfig"
+            else
+                echo "CONFIG_KPROBES=y" >> arch/"$arch"/configs/"$defconfig"
+            fi
+        fi
+
+        if ! grep -q "CONFIG_HAVE_KPROBES=y" arch/"$arch"/configs/"$defconfig"; then
+            if grep -q "# CONFIG_HAVE_KPROBES is not set" arch/"$arch"/configs/"$defconfig"; then
+                sed -i "s/# CONFIG_HAVE_KPROBES is not set/CONFIG_HAVE_KPROBES=y/i" arch/"$arch"/configs/"$defconfig"
+            else
+                echo "CONFIG_HAVE_KPROBES=y" >> arch/"$arch"/configs/"$defconfig"
+            fi
+        fi
+
+        if ! grep -q "CONFIG_KPROBE_EVENTS=y" arch/"$arch"/configs/"$defconfig"; then
+            if grep -q "# CONFIG_KPROBE_EVENTS is not set" arch/"$arch"/configs/"$defconfig"; then
+                sed -i "s/# CONFIG_KPROBE_EVENTS is not set/CONFIG_KPROBE_EVENTS=y/i" arch/"$arch"/configs/"$defconfig"
+            else
+                echo "CONFIG_KPROBE_EVENTS=y" >> arch/"$arch"/configs/"$defconfig"
+            fi
+        fi
+    else
+        echo "Manually integrating KernelSU"
+        sed -i -e "s/CONFIG_KPROBES=y/# CONFIG_KPROBES is not set/i" \
+            -e "s/CONFIG_HAVE_KPROBES=y/# CONFIG_HAVE_KPROBES is not set/i" \
+            -e "s/CONFIG_KPROBE_EVENTS=y/# CONFIG_KPROBE_EVENTS is not set/i" \
+            arch/"$arch"/configs/"$defconfig"
+
+        sed -i -E "s/^#*\s*CONFIG_KSU.*/CONFIG_KSU=y/i" arch/"$arch"/configs/"$defconfig"
+        if ! grep -q "CONFIG_KSU=y" arch/"$arch"/configs/"$defconfig"; then
+            {
+                echo ""
+                echo "#"
+                echo "# KernelSU"
+                echo "#"
+                echo "CONFIG_KSU=y"
+            } >> arch/"$arch"/configs/"$defconfig"
+        fi
+
+        if ! grep -q "extern bool ksu_execveat_hook __read_mostly;" fs/exec.c || /
+          ! grep -q "extern int ksu_handle_faccessat" fs/open.c || /
+          ! grep -q "extern bool ksu_vfs_read_hook __read_mostly;" fs/read_write.c || /
+          ! grep -q "extern int ksu_handle_stat" fs/stat.c; then
+            echo "Failed integrating KernelSU manually, refer to the instructions here: https://kernelsu.org/guide/how-to-integrate-for-non-gki.html#manually-modify-the-kernel-source"
+            exit 3
+        fi
+    fi
+    ksu_tag="$(git describe --abbrev=0 --tags)"
+    set_output notes "Integrated with KernelSU [$ksu_tag](https://github.com/tiann/KernelSU/releases/tag/$ksu_tag)"
 fi
 echo "Packages installed:"
 sudo apt list --installed

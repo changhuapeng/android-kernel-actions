@@ -23,6 +23,12 @@ inputs:
   dtbo:
     description: dtbo image support
     required: true
+  kernelsu:
+    description: KernelSU integration
+    required: true
+  kprobes:
+    description: Using Kprobes for KernelSU integration
+    required: true
 outputs:
   build_date:
     description: Build date and time
@@ -60,5 +66,7 @@ runs:
         IMAGE: ${{ inputs.image }}
         DTB: ${{ inputs.dtb }}
         DTBO: ${{ inputs.dtbo }}
+        KERNELSU: ${{ inputs.kernelsu }}
+        KPROBES: ${{ inputs.kprobes }}
       shell: bash
       run: ${{ github.action_path }}/entrypoint.sh

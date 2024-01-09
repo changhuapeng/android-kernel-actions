@@ -314,9 +314,9 @@ if $kernelsu; then
             } >> arch/"$arch"/configs/"$defconfig"
         fi
 
-        if ! grep -q "extern bool ksu_execveat_hook __read_mostly;" fs/exec.c || /
-          ! grep -q "extern int ksu_handle_faccessat" fs/open.c || /
-          ! grep -q "extern bool ksu_vfs_read_hook __read_mostly;" fs/read_write.c || /
+        if ! grep -q "extern bool ksu_execveat_hook __read_mostly;" fs/exec.c ||
+          ! grep -q "extern int ksu_handle_faccessat" fs/open.c ||
+          ! grep -q "extern bool ksu_vfs_read_hook __read_mostly;" fs/read_write.c ||
           ! grep -q "extern int ksu_handle_stat" fs/stat.c; then
             echo "Failed integrating KernelSU manually, refer to the instructions here: https://kernelsu.org/guide/how-to-integrate-for-non-gki.html#manually-modify-the-kernel-source"
             exit 3

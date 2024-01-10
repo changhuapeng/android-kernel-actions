@@ -21,7 +21,6 @@ extract_tarball(){
     tar xf "$1" -C "$2"
 }
 
-workdir="$GITHUB_WORKSPACE"
 arch="${ARCH:?'was not set'}"
 compiler="${COMPILER:?'was not set'}"
 defconfig="${DEFCONFIG:?'was not set'}"
@@ -31,6 +30,8 @@ dtbo="${DTBO:?'was not set'}"
 kernelsu="${KERNELSU:?'was not set'}"
 kprobes="${KPROBES:?'was not set'}"
 ksu_version="${KSU_VERSION:--}"
+
+workdir="$GITHUB_WORKSPACE"
 repo_name="${GITHUB_REPOSITORY/*\/}"
 zipper_path="${ZIPPER_PATH:-zipper}"
 kernel_path="${KERNEL_PATH:-.}"
@@ -266,6 +267,7 @@ else
 fi
 
 cd "$workdir"/"$kernel_path" || exit 127
+ksu_zip_filename=""
 if $kernelsu; then
     msg "Integrating KernelSU for non GKI kernel..."
     if [[ $ksu_version = "-" ]]; then
@@ -326,11 +328,12 @@ if $kernelsu; then
           ! grep -q "extern int ksu_handle_faccessat" fs/open.c ||
           ! grep -q "extern bool ksu_vfs_read_hook __read_mostly;" fs/read_write.c ||
           ! grep -q "extern int ksu_handle_stat" fs/stat.c; then
-            echo "Failed integrating KernelSU manually, refer to the instructions here: https://kernelsu.org/guide/how-to-integrate-for-non-gki.html#manually-modify-the-kernel-source"
+            err "Failed integrating KernelSU manually, refer to the instructions here: https://kernelsu.org/guide/how-to-integrate-for-non-gki.html#manually-modify-the-kernel-source"
             exit 3
         fi
     fi
     cd "$workdir"/KernelSU || exit 127
+    ksu_zip_filename="-KSU"
     ksu_tag="$(git describe --abbrev=0 --tags)"
     set_output notes "Integrated with KernelSU [$ksu_tag](https://github.com/tiann/KernelSU/releases/tag/$ksu_tag)"
 fi
@@ -343,6 +346,10 @@ date="$(date +%Y%m%d-%H%M)"
 tag="$(git branch | sed 's/*\ //g')"
 echo "branch/tag: $tag"
 set_output build_date "$date"
+
+export KBUILD_BUILD_USER="$GITHUB_REPOSITORY_OWNER"
+export KBUILD_BUILD_HOST="$GITHUB_REPOSITORY"
+export LOCALVERSION="$ksu_zip_filename-$GITHUB_REPOSITORY_OWNER"
 
 echo "make options:" $arch_opts $make_opts $host_make_opts
 msg "Generating defconfig from \`make $defconfig\`..."
@@ -360,7 +367,7 @@ if ! make O=out $arch_opts $make_opts $host_make_opts -j"$(nproc --all)"; then
 fi
 set_output elapsed_time "$(echo "$(date +%s)"-"$start_time" | bc)"
 msg "Packaging the kernel..."
-zip_filename="${name}-${date}.zip"
+zip_filename="${name}-${date}${ksu_zip_filename}.zip"
 if [[ -e "$workdir"/"$zipper_path" ]]; then
     cp out/arch/"$arch"/boot/"$image" "$workdir"/"$zipper_path"/"$image"
 
@@ -399,7 +406,7 @@ if [[ -e "$workdir"/"$zipper_path" ]]; then
     fi
 
     cd "$workdir"/"$zipper_path" || exit 127
-    sed -i -E "s/(kernel.string=).*/\1${name} Kernel by $GITHUB_REPOSITORY_OWNER/i" "$workdir"/"$zipper_path"/anykernel.sh
+    sed -i -E "s/(kernel.string=).*/\1${name}${ksu_zip_filename} kernel by $GITHUB_REPOSITORY_OWNER/i" "$workdir"/"$zipper_path"/anykernel.sh
     rm -rf .git
     zip -r9 "$zip_filename" . -x .gitignore README.md || exit 127
     set_output outfile "$workdir"/"$zipper_path"/"$zip_filename"

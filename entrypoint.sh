@@ -30,6 +30,7 @@ dtb="${DTB:?'was not set'}"
 dtbo="${DTBO:?'was not set'}"
 kernelsu="${KERNELSU:?'was not set'}"
 kprobes="${KPROBES:?'was not set'}"
+ksu_version="${KSU_VERSION:--}"
 repo_name="${GITHUB_REPOSITORY/*\/}"
 zipper_path="${ZIPPER_PATH:-zipper}"
 kernel_path="${KERNEL_PATH:-.}"
@@ -267,9 +268,16 @@ fi
 cd "$workdir"/"$kernel_path" || exit 127
 if $kernelsu; then
     msg "Integrating KernelSU for non GKI kernel..."
-    if ! curl -LSs "https://raw.githubusercontent.com/changhuapeng/KernelSU/main/kernel/setup.sh" | bash -; then
-        err "Failed downloading KernelSU"
-        exit 1
+    if [[ $ksu_version = "-" ]]; then
+        if ! curl -LSs "https://raw.githubusercontent.com/changhuapeng/KernelSU/main/kernel/setup.sh" | bash -; then
+            err "Failed downloading KernelSU"
+            exit 1
+        fi
+    else
+        if ! curl -LSs "https://raw.githubusercontent.com/changhuapeng/KernelSU/main/kernel/setup.sh" | bash -s "$ksu_version"; then
+            err "Failed downloading KernelSU"
+            exit 1
+        fi
     fi
 
     if $kprobes; then

@@ -18,6 +18,7 @@ Builds Android kernel from the kernel repository.
 | `dtbo` | Specify if dtbo image is required or not, `true` or `false` |
 | `kernelsu` | Specify if KernelSU integration is required, `true` or `false` |
 | `kprobes` | Specify if KernelSU should be integrated with Kprobes, `true` or `false` |
+| `ksu_version` | Specify the KernelSU version to be used, e.g. `v0.7.5`(tag), `main`(branch) or `90d63fe`(commit hash). Defaults to latest stable tag if not set |
 
 ### Environment Variables
 

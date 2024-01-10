@@ -29,6 +29,9 @@ inputs:
   kprobes:
     description: Using Kprobes for KernelSU integration
     required: true
+  ksu_version:
+    description: KernelSU version to use
+    required: false
 outputs:
   build_date:
     description: Build date and time
@@ -68,5 +71,6 @@ runs:
         DTBO: ${{ inputs.dtbo }}
         KERNELSU: ${{ inputs.kernelsu }}
         KPROBES: ${{ inputs.kprobes }}
+        KSU_VERSION: ${{ inputs.ksu_version }}
       shell: bash
       run: ${{ github.action_path }}/entrypoint.sh

@@ -270,16 +270,9 @@ cd "$workdir"/"$kernel_path" || exit 127
 ksu_zip_filename=""
 if $kernelsu; then
     msg "Integrating KernelSU for non GKI kernel..."
-    if [[ $ksu_version = "-" ]]; then
-        if ! curl -LSs "https://raw.githubusercontent.com/changhuapeng/KernelSU/main/kernel/setup.sh" | bash -; then
-            err "Failed downloading KernelSU"
-            exit 1
-        fi
-    else
-        if ! curl -LSs "https://raw.githubusercontent.com/changhuapeng/KernelSU/main/kernel/setup.sh" | bash -s "$ksu_version"; then
-            err "Failed downloading KernelSU"
-            exit 1
-        fi
+    if ! curl -LSs "https://raw.githubusercontent.com/changhuapeng/KernelSU/main/kernel/setup.sh" | bash -s "$ksu_version"; then
+        err "Failed downloading KernelSU"
+        exit 1
     fi
 
     if $kprobes; then

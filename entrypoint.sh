@@ -300,7 +300,7 @@ if $kernelsu; then
             fi
         fi
     else
-        echo "Manually integrating KernelSU"
+        echo "Manually integrating KernelSU..."
         sed -i -e "s/CONFIG_KPROBES=y/# CONFIG_KPROBES is not set/i" \
             -e "s/CONFIG_HAVE_KPROBES=y/# CONFIG_HAVE_KPROBES is not set/i" \
             -e "s/CONFIG_KPROBE_EVENTS=y/# CONFIG_KPROBE_EVENTS is not set/i" \
@@ -317,6 +317,7 @@ if $kernelsu; then
             } >> arch/"$arch"/configs/"$defconfig"
         fi
 
+        bash "$workdir"/patches/ksu.sh
         if ! grep -q "extern bool ksu_execveat_hook __read_mostly;" fs/exec.c ||
           ! grep -q "extern int ksu_handle_faccessat" fs/open.c ||
           ! grep -q "extern bool ksu_vfs_read_hook __read_mostly;" fs/read_write.c ||
@@ -325,7 +326,17 @@ if $kernelsu; then
             exit 3
         fi
     fi
+
+    # Backport functions to kernel for umount modules support for Non-GKI kernel
+    git apply --3way "$workdir"/patches/backport_umount.patch
+
+
     cd "$workdir"/KernelSU || exit 127
+    # Patch KernelSU for umount modules support for Non-GKI kernel
+    git remote add patch https://github.com/changhuapeng/KernelSU
+    git fetch patch main
+    git cherry-pick -n 8277aa955b07e64396f572f44289cc348788c298
+
     ksu_zip_filename="-KSU"
     ksu_tag="$(git describe --abbrev=0 --tags)"
     set_output notes "Integrated with KernelSU [$ksu_tag](https://github.com/tiann/KernelSU/releases/tag/$ksu_tag)"

@@ -267,7 +267,7 @@ else
 fi
 
 cd "$workdir"/"$kernel_path" || exit 127
-ksu_zip_filename=""
+ksu_name=""
 if $kernelsu; then
     msg "Integrating KernelSU for non GKI kernel..."
     if ! curl -LSs "https://raw.githubusercontent.com/changhuapeng/KernelSU/main/kernel/setup.sh" | bash -s "$ksu_version"; then
@@ -308,16 +308,10 @@ if $kernelsu; then
 
         sed -i -E "s/^#*\s*CONFIG_KSU.*/CONFIG_KSU=y/i" arch/"$arch"/configs/"$defconfig"
         if ! grep -q "CONFIG_KSU=y" arch/"$arch"/configs/"$defconfig"; then
-            {
-                echo ""
-                echo "#"
-                echo "# KernelSU"
-                echo "#"
-                echo "CONFIG_KSU=y"
-            } >> arch/"$arch"/configs/"$defconfig"
+            echo "CONFIG_KSU=y" >> arch/"$arch"/configs/"$defconfig"
         fi
 
-        bash "$workdir"/patches/ksu.sh
+        bash "$GITHUB_ACTION_PATH"/patches/ksu.sh
         if ! grep -q "extern bool ksu_execveat_hook __read_mostly;" fs/exec.c ||
           ! grep -q "extern int ksu_handle_faccessat" fs/open.c ||
           ! grep -q "extern bool ksu_vfs_read_hook __read_mostly;" fs/read_write.c ||
@@ -328,7 +322,7 @@ if $kernelsu; then
     fi
 
     # Backport functions to kernel for umount modules support for Non-GKI kernel
-    git apply --3way "$workdir"/patches/backport_umount.patch
+    git apply "$GITHUB_ACTION_PATH"/patches/backport_umount.patch
 
 
     cd "$workdir"/KernelSU || exit 127
@@ -337,9 +331,13 @@ if $kernelsu; then
     git fetch patch main
     git cherry-pick -n 8277aa955b07e64396f572f44289cc348788c298
 
-    ksu_zip_filename="-KSU"
-    ksu_tag="$(git describe --abbrev=0 --tags)"
-    set_output notes "Integrated with KernelSU [$ksu_tag](https://github.com/tiann/KernelSU/releases/tag/$ksu_tag)"
+    KSU_VER=$(($(git rev-list --count HEAD) + 10200))
+    ksu_name="-KSU-$KSU_VER"
+    ksu_commit="$(git rev-parse HEAD)"
+    release_file="$workdir"/release.txt
+    printf "Integrated with KernelSU commit [$(echo $ksu_commit | cut -c1-7)](https://github.com/tiann/KernelSU/commit/$ksu_commit" >> $release_file
+    printf "\n\n###### IMPORTANT: This KSU kernel build is not tested extensively, use at your own risk!" >> $release_file
+    set_output notes "$release_file"
 fi
 echo "Packages installed:"
 sudo apt list -q --installed
@@ -351,9 +349,9 @@ tag="$(git branch | sed 's/*\ //g')"
 echo "branch/tag: $tag"
 set_output build_date "$date"
 
-export KBUILD_BUILD_USER="$GITHUB_REPOSITORY_OWNER"
+export KBUILD_BUILD_USER="$(git rev-parse --short HEAD | cut -c1-7)"
 export KBUILD_BUILD_HOST="$GITHUB_REPOSITORY"
-export LOCALVERSION="$ksu_zip_filename-$GITHUB_REPOSITORY_OWNER"
+export LOCALVERSION="-$(echo $defconfig | cut -d "_" -f 1)${ksu_name}"
 
 echo "make options:" $arch_opts $make_opts $host_make_opts
 msg "Generating defconfig from \`make $defconfig\`..."
@@ -371,7 +369,7 @@ if ! make O=out $arch_opts $make_opts $host_make_opts -j"$(nproc --all)"; then
 fi
 set_output elapsed_time "$(echo "$(date +%s)"-"$start_time" | bc)"
 msg "Packaging the kernel..."
-zip_filename="${name}-${date}${ksu_zip_filename}.zip"
+zip_filename="${name}-${date}${ksu_name}.zip"
 if [[ -e "$workdir"/"$zipper_path" ]]; then
     cp out/arch/"$arch"/boot/"$image" "$workdir"/"$zipper_path"/"$image"
 
@@ -410,7 +408,7 @@ if [[ -e "$workdir"/"$zipper_path" ]]; then
     fi
 
     cd "$workdir"/"$zipper_path" || exit 127
-    sed -i -E "s/(kernel.string=).*/\1${name}${ksu_zip_filename} kernel by $GITHUB_REPOSITORY_OWNER/i" "$workdir"/"$zipper_path"/anykernel.sh
+    sed -i -E "s/(kernel.string=).*/\1${name}${ksu_name} kernel by $GITHUB_REPOSITORY_OWNER/i" "$workdir"/"$zipper_path"/anykernel.sh
     rm -rf .git
     zip -r9 "$zip_filename" . -x .gitignore README.md || exit 127
     set_output outfile "$workdir"/"$zipper_path"/"$zip_filename"

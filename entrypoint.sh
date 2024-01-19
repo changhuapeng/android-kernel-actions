@@ -216,6 +216,8 @@ if [[ $arch = "arm64" ]]; then
             err "Failed downloading toolchain, refer to the README for details"
             exit 1
         fi
+        bash antman --patch=glibc &>/dev/null
+        bash antman --info
         neutron_path="$(pwd)"
         cd "$workdir"/"$kernel_path" || exit 127
 

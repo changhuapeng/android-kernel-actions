@@ -335,7 +335,7 @@ if $kernelsu; then
     ksu_name="-KSU-$KSU_VER"
     ksu_commit="$(git rev-parse HEAD)"
     release_file="$workdir"/release.txt
-    printf "Integrated with KernelSU commit [$(echo $ksu_commit | cut -c1-7)](https://github.com/tiann/KernelSU/commit/$ksu_commit" >> $release_file
+    printf "Integrated with https://github.com/tiann/KernelSU/commit/$ksu_commit" >> $release_file
     printf "\n\n###### IMPORTANT: This KSU kernel build is not tested extensively, use at your own risk!" >> $release_file
     set_output notes "$release_file"
 fi

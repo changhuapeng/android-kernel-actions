@@ -278,28 +278,19 @@ if $kernelsu; then
     fi
 
     if $kprobes; then
+        sed -i -E "s/^#*\s*CONFIG_KPROBES[ is|=].*/CONFIG_KPROBES=y/i" arch/"$arch"/configs/"$defconfig"
         if ! grep -q "CONFIG_KPROBES=y" arch/"$arch"/configs/"$defconfig"; then
-            if grep -q "# CONFIG_KPROBES is not set" arch/"$arch"/configs/"$defconfig"; then
-                sed -i "s/# CONFIG_KPROBES is not set/CONFIG_KPROBES=y/i" arch/"$arch"/configs/"$defconfig"
-            else
-                echo "CONFIG_KPROBES=y" >> arch/"$arch"/configs/"$defconfig"
-            fi
+            echo "CONFIG_KPROBES=y" >> arch/"$arch"/configs/"$defconfig"
         fi
 
+        sed -i -E "s/^#*\s*CONFIG_HAVE_KPROBES[ is|=].*/CONFIG_HAVE_KPROBES=y/i" arch/"$arch"/configs/"$defconfig"
         if ! grep -q "CONFIG_HAVE_KPROBES=y" arch/"$arch"/configs/"$defconfig"; then
-            if grep -q "# CONFIG_HAVE_KPROBES is not set" arch/"$arch"/configs/"$defconfig"; then
-                sed -i "s/# CONFIG_HAVE_KPROBES is not set/CONFIG_HAVE_KPROBES=y/i" arch/"$arch"/configs/"$defconfig"
-            else
-                echo "CONFIG_HAVE_KPROBES=y" >> arch/"$arch"/configs/"$defconfig"
-            fi
+            echo "CONFIG_HAVE_KPROBES=y" >> arch/"$arch"/configs/"$defconfig"
         fi
 
+        sed -i -E "s/^#*\s*CONFIG_KPROBE_EVENTS[ is|=].*/CONFIG_KPROBE_EVENTS=y/i" arch/"$arch"/configs/"$defconfig"
         if ! grep -q "CONFIG_KPROBE_EVENTS=y" arch/"$arch"/configs/"$defconfig"; then
-            if grep -q "# CONFIG_KPROBE_EVENTS is not set" arch/"$arch"/configs/"$defconfig"; then
-                sed -i "s/# CONFIG_KPROBE_EVENTS is not set/CONFIG_KPROBE_EVENTS=y/i" arch/"$arch"/configs/"$defconfig"
-            else
-                echo "CONFIG_KPROBE_EVENTS=y" >> arch/"$arch"/configs/"$defconfig"
-            fi
+            echo "CONFIG_KPROBE_EVENTS=y" >> arch/"$arch"/configs/"$defconfig"
         fi
     else
         echo "Manually integrating KernelSU..."
@@ -308,7 +299,7 @@ if $kernelsu; then
             -e "s/CONFIG_KPROBE_EVENTS=y/# CONFIG_KPROBE_EVENTS is not set/i" \
             arch/"$arch"/configs/"$defconfig"
 
-        sed -i -E "s/^#*\s*CONFIG_KSU.*/CONFIG_KSU=y/i" arch/"$arch"/configs/"$defconfig"
+        sed -i -E "s/^#*\s*CONFIG_KSU[ is|=].*/CONFIG_KSU=y/i" arch/"$arch"/configs/"$defconfig"
         if ! grep -q "CONFIG_KSU=y" arch/"$arch"/configs/"$defconfig"; then
             echo "CONFIG_KSU=y" >> arch/"$arch"/configs/"$defconfig"
         fi
@@ -325,7 +316,6 @@ if $kernelsu; then
 
     # Backport functions to kernel for umount modules support for Non-GKI kernel
     git apply "$GITHUB_ACTION_PATH"/patches/backport_umount.patch
-
 
     cd "$workdir"/KernelSU || exit 127
     # Patch KernelSU for umount modules support for Non-GKI kernel

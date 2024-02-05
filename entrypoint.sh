@@ -317,6 +317,8 @@ if $kernelsu; then
           ! grep -q "if (unlikely(ksu_input_hook))" drivers/input/input.c; then
             err "Failed integrating KernelSU manually, refer to the instructions here: https://kernelsu.org/guide/how-to-integrate-for-non-gki.html#manually-modify-the-kernel-source"
             exit 3
+        else
+            echo "Kernel is patched for KernelSU"
         fi
     fi
 
@@ -325,6 +327,8 @@ if $kernelsu; then
       grep -q "if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 9, 0)" KernelSU/kernel/core_hook.c; then
         err "Failed backporting umount modules support"
         exit 3
+    else
+        echo "Kernel is patched for umount modules support"
     fi
 
     cd "$workdir"/KernelSU || exit 127

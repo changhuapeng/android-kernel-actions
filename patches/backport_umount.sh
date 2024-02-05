@@ -56,5 +56,3 @@ if ! grep -q "static int can_umount" fs/namespace.c; then
         sed -i -e "$((ns_line_num - 1))"'i \'"${preprocessed_PATCH%?}" fs/namespace.c
     fi
 fi
-
-echo "Kernel is patched for umount modules support"

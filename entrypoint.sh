@@ -304,25 +304,30 @@ if $kernelsu; then
             echo "CONFIG_KSU=y" >> arch/"$arch"/configs/"$defconfig"
         fi
 
-        bash "$GITHUB_ACTION_PATH"/patches/ksu.sh
+        bash "$GITHUB_ACTION_PATH"/patches/ksu_integration.sh
         if ! grep -q "extern bool ksu_execveat_hook __read_mostly;" fs/exec.c ||
+          ! grep -q "if (unlikely(ksu_execveat_hook))" fs/exec.c ||
           ! grep -q "extern int ksu_handle_faccessat" fs/open.c ||
+          ! grep -q "ksu_handle_faccessat(&dfd, &filename, &mode, NULL);" fs/open.c ||
           ! grep -q "extern bool ksu_vfs_read_hook __read_mostly;" fs/read_write.c ||
-          ! grep -q "extern int ksu_handle_stat" fs/stat.c; then
+          ! grep -q "if (unlikely(ksu_vfs_read_hook))" fs/read_write.c ||
+          ! grep -q "extern int ksu_handle_stat" fs/stat.c ||
+          ! grep -q "ksu_handle_stat(&dfd, &filename, &flag" fs/stat.c ||
+          ! grep -q "extern bool ksu_input_hook __read_mostly;" drivers/input/input.c ||
+          ! grep -q "if (unlikely(ksu_input_hook))" drivers/input/input.c; then
             err "Failed integrating KernelSU manually, refer to the instructions here: https://kernelsu.org/guide/how-to-integrate-for-non-gki.html#manually-modify-the-kernel-source"
             exit 3
         fi
     fi
 
-    # Backport functions to kernel for umount modules support for Non-GKI kernel
-    git apply "$GITHUB_ACTION_PATH"/patches/backport_umount.patch
+    bash "$GITHUB_ACTION_PATH"/patches/backport_umount.sh
+    if ! grep -q "static int can_umount" fs/namespace.c ||
+      grep -q "if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 9, 0)" KernelSU/kernel/core_hook.c; then
+        err "Failed backporting umount modules support"
+        exit 3
+    fi
 
     cd "$workdir"/KernelSU || exit 127
-    # Patch KernelSU for umount modules support for Non-GKI kernel
-    git remote add patch https://github.com/changhuapeng/KernelSU
-    git fetch patch main
-    git cherry-pick -n 8277aa955b07e64396f572f44289cc348788c298
-
     KSU_VER=$(($(git rev-list --count HEAD) + 10200))
     ksu_name="-KSU-$KSU_VER"
     ksu_commit="$(git rev-parse HEAD)"

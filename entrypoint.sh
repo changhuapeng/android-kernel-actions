@@ -322,13 +322,14 @@ if $kernelsu; then
         fi
     fi
 
+    echo "Backporting module umount feature..."
     bash "$GITHUB_ACTION_PATH"/patches/backport_umount.sh
     if ! grep -q "static int can_umount" fs/namespace.c ||
-      grep -q "if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 9, 0)" KernelSU/kernel/core_hook.c; then
-        err "Failed backporting umount modules support"
+      ! grep -q "int path_umount" fs/namespace.c; then
+        err "Failed backporting module umount feature"
         exit 3
     else
-        echo "Kernel is patched for umount modules support"
+        echo "Kernel is patched for module umount feature"
     fi
 
     cd "$workdir"/KernelSU || exit 127
